@@ -101,8 +101,10 @@ class EmailService:
             print(f"[email] Send error: {e}")
             return False
 
+# ✅ Correctly placed instance creation
+email_service = EmailService()
+
 # Example usage
-# email_service = EmailService()
 # contact_data = {
 #     "name": "John Doe",
 #     "email": "john@example.com",
