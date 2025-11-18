@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 // ✅ CHANGE THIS PATH to match your project:
 // If the helper is at project-root/lib/contactApi.(js|ts):
+import { contactApi } from './lib/contactApi';
 
 // If it's at app/lib/contactApi:
 /// import { contactApi } from '../lib/contactApi';
