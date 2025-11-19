@@ -5,10 +5,7 @@ import { useEffect, useState } from 'react';
 
 // ✅ CHANGE THIS PATH to match your project:
 // If the helper is at project-root/lib/contactApi.(js|ts):
-import { contactApi } from './lib/contactApi';
-
-// If it's at app/lib/contactApi:
-/// import { contactApi } from '../lib/contactApi';
+import { contactApi } from './lib/contactApi'; 
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +31,7 @@ const ContactForm = () => {
     setErrorMessage('');
 
     try {
-      const result = await contactApi.submit(formData); // make sure your helper exports .submit
+      const result = await contactApi.submit(formData);
       if (result?.success ?? true) {
         setFormStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
@@ -128,6 +125,41 @@ const ContactForm = () => {
 const Portfolio = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  // -- NEW: State for handling projects and the Modal --
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newProjectData, setNewProjectData] = useState({
+    title: '',
+    description: '',
+    technologies: '',
+  });
+
+  // Convert static projects to State so we can add to it
+  const [projects, setProjects] = useState([
+    {
+      id: 1,
+      title: 'Portfolio Website',
+      description:
+        'Personal portfolio to showcase projects, technical skills, and achievements. Built for high performance and SEO.',
+      technologies: ['Next.js', 'React', 'Node.js', 'CSS', 'Vercel'],
+    },
+    {
+      id: 2,
+      title: 'Hospital Management System',
+      description:
+        'Simple system for managing patient records with file-based storage and retrieval.',
+      technologies: ['C', 'File Handling'],
+    },
+  ]);
+
+  const skills = [
+    { name: 'C', level: 70 },
+    { name: 'C++', level: 65 },
+    { name: 'HTML', level: 80 },
+    { name: 'CSS', level: 75 },
+    { name: 'JavaScript (learning)', level: 55 },
+    { name: 'Next.js (learning)', level: 50 },
+  ];
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 50);
@@ -143,32 +175,23 @@ const Portfolio = () => {
     setIsMenuOpen(false);
   };
 
-  // ——— Customize as you like ———
-  const projects = [
-    {
-      id: 1,
-      title: 'Portfolio Website',
-      description:
-        'Personal portfolio to showcase projects, technical skills, and achievements. Built for high performance and SEO.',
-      technologies: ['Next.js', 'React', 'Node.js', 'CSS', 'Vercel'],
-    },
-    {
-      id: 2,
-      title: 'Hospital Management System',
-      description:
-        'Simple system for managing patient records with file-based storage and retrieval.',
-      technologies: ['C', 'File Handling'],
-    },
-  ];
+  // -- NEW: Logic to add a project --
+  const handleAddProject = (e) => {
+    e.preventDefault();
+    if (!newProjectData.title || !newProjectData.description) return;
 
-  const skills = [
-    { name: 'C', level: 70 },
-    { name: 'C++', level: 65 },
-    { name: 'HTML', level: 80 },
-    { name: 'CSS', level: 75 },
-    { name: 'JavaScript (learning)', level: 55 },
-    { name: 'Next.js (learning)', level: 50 },
-  ];
+    const newProject = {
+      id: projects.length + 1,
+      title: newProjectData.title,
+      description: newProjectData.description,
+      // Split comma-separated string into array
+      technologies: newProjectData.technologies.split(',').map(t => t.trim()).filter(t => t),
+    };
+
+    setProjects([...projects, newProject]);
+    setNewProjectData({ title: '', description: '', technologies: '' });
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -396,9 +419,17 @@ const Portfolio = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
               My Projects
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
               A few things I’ve built recently.
             </p>
+
+            {/* -- NEW: Add Project Button -- */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors shadow-md"
+            >
+              <span className="mr-2 text-lg">+</span> Add New Project
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -575,6 +606,64 @@ const Portfolio = () => {
           </div>
         </div>
       </footer>
+
+      {/* -- NEW: Add Project Modal Overlay -- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-60 px-4">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-4 text-gray-800">Add New Project</h3>
+            <form onSubmit={handleAddProject} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+                <input
+                  type="text"
+                  required
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="e.g. E-commerce Site"
+                  value={newProjectData.title}
+                  onChange={(e) => setNewProjectData({...newProjectData, title: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  required
+                  rows="3"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Brief description of the project..."
+                  value={newProjectData.description}
+                  onChange={(e) => setNewProjectData({...newProjectData, description: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Technologies</label>
+                <input
+                  type="text"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="React, Node.js, CSS (comma separated)"
+                  value={newProjectData.technologies}
+                  onChange={(e) => setNewProjectData({...newProjectData, technologies: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                >
+                  Save Project
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
