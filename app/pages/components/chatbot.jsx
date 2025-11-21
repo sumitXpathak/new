@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageCircle, X, Loader2 } from 'lucide-react';
+import PortfolioChatbot from '@/components/chatbot';
 
 export default function PortfolioChatbot() {
   const [isOpen, setIsOpen] = useState(false);
